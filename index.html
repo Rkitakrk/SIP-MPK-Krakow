@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .tables_wrap{
+            padding: 50px;
+            display: flex;
+        }
+        .tables_wrap > div{
+            width: calc(50% - 15px);
+        }
+        #line{
+            margin-right: 30px;
+        }
+        .table_title{
+            margin-bottom: 15px;
+            display: block;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .one_row{
+            display: flex;
+            border: 2px solid gray;
+            border-bottom: 0;
+        }
+        .first_row{
+            border: 3px solid gray;
+            border-bottom: 2px solid gray;
+            font-weight: bold;
+        }
+        .one_row:last-child{
+            border-bottom: 2px solid gray;
+        }
+        .one_row > div{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+        }
+        .lp_vehicle{
+            width: 10%; 
+        }
+        .id_vehicle{
+            width: 40%;
+        }
+        .vehicle_number{
+            width: 25%;
+        }
+        .vehicle_delay{
+            width: 25%;
+
+        }
+        .lp_vehicle, .id_vehicle, .vehicle_number{
+            border-right: 1px solid gray;
+        }
+    </style>
+</head>
+<body>
+    <div class="tables_wrap">
+        <div id="line"></div>
+        <div id="route"></div>
+    </div>
+    
+    
+</body>
+<script>
+    fetch('http://localhost:12345/selectAllDelay').then(function (response) {
+        return response.json();
+    }).then(function (obj) {
+        var layoutLine = "";
+        layoutLine += displayLine(obj.LineDelayOne, "Linie ostatnia minuta")
+        layoutLine += displayLine(obj.LineDelayFive, "Linie ostatnie 5 minut")
+        layoutLine += displayLine(obj.LineDelayFifteen, "Linie ostatnie 15 minut")
+        layoutLine += displayLine(obj.LineDelayOneHour, "Linie ostatnie 60 minut")
+        layoutLine += displayLine(obj.LineDelaySixHour, "Linie ostatnie 6 godzin")
+        var layoutRoute = "";
+        layoutRoute += displayRoute(obj.RouteDelayOne, "Route ostatnia minuta")
+        layoutRoute += displayRoute(obj.RouteDelayFive, "Route ostatnie 5 minut")
+        layoutRoute += displayRoute(obj.RouteDelayFifteen, "Route ostatnie 15 minut")
+        layoutRoute += displayRoute(obj.RouteDelayOneHour, "Route ostatnie 60 minut")
+        layoutRoute += displayRoute(obj.RouteDelaySixHour, "Route ostatnie 6 godzin")
+
+        var x = document.getElementById("route");
+        var y = document.getElementById("line");
+        // console.log(layout);
+        x.innerHTML = layoutRoute;
+        y.innerHTML = layoutLine;
+
+      
+        // console.log(obj.LineDelayOne)
+    }).catch(function (error){
+        console.log("Something wnet wrong ")
+        console.error(error)
+    });
+
+    function displayLine(object, content){
+     
+        var layout = '<div>';
+            layout += '<div class="table_title">'+ content+'</div>';
+            layout += `<div class="one_row first_row">`+
+                `<div class="lp_vehicle">Lp.</div>`+
+                
+                `<div class="vehicle_number">Numer Pojazdu</div>`+
+                `<div class="vehicle_delay">Opóźnienie Pojazdu</div>`+
+                `</div>`;
+
+        for(var a = 0; a<object.length; a++){
+            var lp = a+1;
+            layout += '<div class="one_row"><div class="lp_vehicle">'+lp+'</div><div class="vehicle_number">'+object[a].numberVehicle+'</div>';
+           
+            if (object[a].delay == undefined){
+                layout += '<div class="vehicle_delay"> 0 </div>';
+            }else{
+                layout += '<div class="vehicle_delay">'+ object[a].delay +'</div>';
+            }  
+            layout += '</div>'; 
+        }
+
+        layout += '</div>';
+        return layout;
+    }
+
+    //Wyświetlanie tabeli z danymi, która dotyczy Tras
+    function displayRoute(object, content){
+        var layout = '<div>';
+            layout += '<div class="table_title">'+ content+'</div>';
+            layout += `<div class="one_row first_row">`+
+                `<div class="lp_vehicle">Lp.</div>`+
+                `<div class="id_vehicle">ID Pojazdu</div>`+
+                `<div class="vehicle_number">Numer Pojazdu</div>`+
+                `<div class="vehicle_delay">Opóźnienie Pojazdu</div>`+
+                `</div>`;
+
+        for(var a = 0; a<object.length; a++){
+            var lp = a+1;
+            layout += '<div class="one_row"><div class="lp_vehicle">'+lp+'</div><div class="id_vehicle">'+object[a].id+'</div><div class="vehicle_number">'+object[a].numberVehicle+'</div>';
+           
+            if (object[a].delay == undefined){
+                layout += '<div class="vehicle_delay"> 0 </div>';
+            }else{
+                layout += '<div class="vehicle_delay">'+ object[a].delay +'</div>';
+            }  
+            layout += '</div>'; 
+        }
+
+        layout += '</div>';
+        return layout;
+    }
+</script>
+</html>
